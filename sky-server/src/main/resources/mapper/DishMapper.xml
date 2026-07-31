@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.DishMapper">
+    <delete id="deleteIds">
+        delete from dish where id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+    </delete>
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
         select d.*, c.name as category_name
         from dish d
