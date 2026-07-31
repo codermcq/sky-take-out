@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
-import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
@@ -20,8 +19,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -79,10 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // createTime/updateTime/createUser/updateUser 由 AutoFillAspect 自动填充
         employeeMapper.insert(employee);
     }
 
@@ -110,7 +104,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public void status(Long id, Integer status) {
-        Employee employee = Employee.builder().status(status).id(id).updateTime(LocalDateTime.now()).updateUser(BaseContext.getCurrentId()).build();
+        // updateTime/updateUser 由 AutoFillAspect 自动填充
+        Employee employee = Employee.builder().status(status).id(id).build();
 
         employeeMapper.update(employee);
     }
@@ -133,8 +128,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmpInfo(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // updateTime/updateUser 由 AutoFillAspect 自动填充
         employeeMapper.update(employee);
     }
 

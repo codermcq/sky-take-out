@@ -27,6 +27,7 @@ public class CategoryController {
     @ApiOperation("新增分类")
     @PostMapping
     public Result save(@RequestBody CategoryDTO categoryDTO) {
+        log.info("新增的分类信息: {}", categoryDTO);
         categoryService.save(categoryDTO);
         return Result.success();
     }
@@ -39,6 +40,7 @@ public class CategoryController {
     @ApiOperation("分类分页查询")
     @GetMapping("/page")
     public Result page(CategoryPageQueryDTO categoryPageQueryDTO) {
+        log.info("分类分页查询: {}", categoryPageQueryDTO);
         PageResult pageResult = categoryService.page(categoryPageQueryDTO);
         return Result.success(pageResult);
     }
@@ -51,6 +53,7 @@ public class CategoryController {
      */
     @PostMapping("/status/{status}")
     public Result status(@PathVariable Integer status, Long id) {
+        log.info("启用禁用分类状态: {} {}", status, id);
         categoryService.status(status, id);
         return Result.success();
     }
@@ -62,6 +65,7 @@ public class CategoryController {
     @ApiOperation("修改分类")
     @PutMapping
     public Result updateCateInfo(@RequestBody CategoryDTO categoryDTO) {
+        log.info("修改的分类信息为: {}", categoryDTO);
         categoryService.updateInfo(categoryDTO);
         return Result.success();
     }
@@ -69,6 +73,7 @@ public class CategoryController {
     @ApiOperation("删除分类")
     @DeleteMapping("/{id}")
     public Result deleteById(@PathVariable Long id) {
+        log.info("删除的分类id为: {}", id);
         categoryService.deleteById(id);
         return Result.success();
     }
