@@ -42,4 +42,16 @@ public class CategoryController {
         PageResult pageResult = categoryService.page(categoryPageQueryDTO);
         return Result.success(pageResult);
     }
+
+    /**
+     * 启用禁用分类状态
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result status(@PathVariable Integer status, Long id) {
+        categoryService.status(status, id);
+        return Result.success();
+    }
 }
