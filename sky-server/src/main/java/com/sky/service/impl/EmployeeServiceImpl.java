@@ -86,6 +86,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insert(employee);
     }
 
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
     @Override
     public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
@@ -96,6 +101,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> result = page.getResult();
 
         return new PageResult(total, result);
+    }
+
+    /**
+     * 修改员工状态
+     * @param id
+     * @param status
+     */
+    @Override
+    public void status(Long id, Integer status) {
+        Employee employee = Employee.builder().status(status).id(id).updateTime(LocalDateTime.now()).build();
+
+        employeeMapper.update(employee);
     }
 
 
