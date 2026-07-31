@@ -99,4 +99,47 @@ public class DishServiceImpl implements DishService {
         dishMapper.deleteIds(ids);
         dishFlavorMapper.deleteByDishIds(ids);
     }
+
+    /**
+     * 菜品起售禁售
+     * @param status
+     * @param id
+     */
+    @Override
+    public void status(Integer status, Long id) {
+        Dish dish = Dish.builder().status(status).id(id).build();
+
+        dishMapper.updateInfo(dish);
+    }
+
+    /**
+     * 根据id查询菜品信息
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO getInfoById(Long id) {
+        return dishMapper.getInfoById(id);
+    }
+
+    /**
+     * 修改菜品信息
+     * @param dishVO
+     */
+    @Override
+    @Transactional
+    public void updateInfo(DishVO dishVO) {
+        // DishVO → Dish 实体，AutoFill 才能注入 updateTime/updateUser
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishVO, dish);
+        dishMapper.updateInfo(dish);
+
+        // 更新口味：先删后插
+        dishFlavorMapper.deleteByDishId(dishVO.getId());
+        List<DishFlavor> flavors = dishVO.getFlavors();
+        if (flavors != null && !flavors.isEmpty()) {
+            flavors.forEach(f -> f.setDishId(dishVO.getId()));
+            dishFlavorMapper.insert(flavors);
+        }
+    }
 }
