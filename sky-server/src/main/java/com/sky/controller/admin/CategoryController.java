@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
@@ -11,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/admin/category")
-@Api("分类相关接口")
+@Api(tags = "分类相关接口")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
@@ -51,6 +54,7 @@ public class CategoryController {
      * @param id
      * @return
      */
+    @ApiOperation("启用禁用分类状态")
     @PostMapping("/status/{status}")
     public Result status(@PathVariable Integer status, Long id) {
         log.info("启用禁用分类状态: {} {}", status, id);
@@ -76,5 +80,17 @@ public class CategoryController {
         log.info("删除的分类id为: {}", id);
         categoryService.deleteById(id);
         return Result.success();
+    }
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return
+     */
+    @ApiOperation("根据类型查询分类")
+    @GetMapping("/list")
+    public Result categoryList(Integer type) {
+        List<Category> categoryList = categoryService.categoryList(type);
+        return Result.success(categoryList);
     }
 }
