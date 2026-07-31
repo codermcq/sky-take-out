@@ -137,4 +137,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
     }
+
+    /**
+     * 根据id删除员工
+     * @return
+     */
+    @Override
+    public void deleteById(Integer id) {
+        employeeMapper.deleteById(id);
+    }
 }

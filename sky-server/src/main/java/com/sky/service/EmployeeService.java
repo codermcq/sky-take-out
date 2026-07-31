@@ -48,4 +48,10 @@ public interface EmployeeService {
      * @return
      */
     void updateEmpInfo(EmployeeDTO employeeDTO);
+
+    /**
+     * 根据id删除员工
+     * @return
+     */
+    void deleteById(Integer id);
 }

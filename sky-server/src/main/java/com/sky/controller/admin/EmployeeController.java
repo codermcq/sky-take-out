@@ -145,4 +145,16 @@ public class EmployeeController {
         employeeService.updateEmpInfo(employeeDTO);
         return Result.success();
     }
+
+    /**
+     * 根据id删除员工
+     * @return
+     */
+    @ApiOperation("根据id删除员工")
+    @DeleteMapping("/{id}")
+    public Result deleteById(@PathVariable Integer id) {
+        log.info("删除的员工id: {}", id);
+        employeeService.deleteById(id);
+        return Result.success();
+    }
 }
