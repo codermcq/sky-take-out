@@ -54,4 +54,16 @@ public class CategoryController {
         categoryService.status(status, id);
         return Result.success();
     }
+
+    /**
+     * 修改分类
+     * @return
+     */
+    @ApiOperation("修改分类")
+    @PutMapping
+    public Result updateCateInfo(@RequestBody CategoryDTO categoryDTO) {
+        categoryService.updateInfo(categoryDTO);
+        return Result.success();
+    }
+    
 }

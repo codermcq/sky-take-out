@@ -25,4 +25,6 @@ public interface CategoryService {
      * @return
      */
     void status(Integer status, Long id);
+
+    void updateInfo(CategoryDTO categoryDTO);
 }
