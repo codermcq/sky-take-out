@@ -50,10 +50,14 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
 
-        registry.addInterceptor(jwtTokenAdminInterceptor)
+        // 用户端：使用用户端拦截器（读 authentication 头），仅保护需登录的接口，浏览类接口免登录
+        registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns("/user/user/login")
-                .excludePathPatterns("/user/shop/status");
+                .excludePathPatterns("/user/shop/status")
+                .excludePathPatterns("/user/category/**")
+                .excludePathPatterns("/user/dish/**")
+                .excludePathPatterns("/user/setmeal/**");
     }
 
     /**

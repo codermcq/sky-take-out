@@ -71,4 +71,11 @@ public interface DishMapper {
      * @return
      */
     DishVO getInfoById(Long id);
+
+    /**
+     * 条件查询菜品（用户端：按分类id + 起售状态过滤）
+     * @param dish
+     * @return
+     */
+    List<Dish> list(Dish dish);
 }
