@@ -1,5 +1,7 @@
 package com.sky.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +22,15 @@ public class RedisConfiguration {
 
         // 创建字符串序列化器（用于 key）
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        // 创建 JSON 序列化器（用于 value）
-        GenericJackson2JsonRedisSerializer jsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+        // 创建 JSON 序列化器（用于 value），注册 JavaTimeModule 以支持 LocalDateTime
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.activateDefaultTyping(
+                objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL
+        );
+        GenericJackson2JsonRedisSerializer jsonRedisSerializer =
+                new GenericJackson2JsonRedisSerializer(objectMapper);
 
         // key 使用字符串序列化
         redisTemplate.setKeySerializer(stringRedisSerializer);

@@ -11,10 +11,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -23,6 +24,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 新增菜品
@@ -33,6 +36,11 @@ public class DishController {
     @PostMapping
     public Result save(@RequestBody DishDTO dishDTO) {
         dishService.saveWithFlavor(dishDTO);
+
+        // 清除缓存数据
+        String key = "dish_" + dishDTO.getId();
+        cleanCache(key);
+
         return Result.success();
     }
 
@@ -49,27 +57,19 @@ public class DishController {
     }
 
     /**
-     * 根据id删除菜品
-     * @param id
-     * @return
-     */
-    @ApiOperation("根据id删除菜品")
-    @DeleteMapping("/{id}")
-    public Result deleteById(@PathVariable Long id) {
-        dishService.deleteBatch(Collections.singletonList(id));
-        return Result.success();
-    }
-
-    /**
-     * 菜品批量删除
+     * 菜品删除（支持单个和批量）
      * @param ids
      * @return
      */
-    @ApiOperation("菜品批量删除")
+    @ApiOperation("菜品删除")
     @DeleteMapping
     public Result delete(@RequestParam List<Long> ids) {
-        log.info("菜品批量删除: {}", ids);
+        log.info("菜品删除: {}", ids);
         dishService.deleteBatch(ids);
+
+        // 清理缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -82,6 +82,9 @@ public class DishController {
     public Result status(@PathVariable Integer status, Long id) {
         log.info("菜品状态和id: {} {}", status, id);
         dishService.status(status, id);
+        // 清理缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -107,6 +110,18 @@ public class DishController {
     public Result updateInfo(@RequestBody DishVO dishVO) {
         log.info("修改的菜品信息为: {}", dishVO);
         dishService.updateInfo(dishVO);
+        // 清理缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
+    }
+
+    /**
+     * 清理缓存数据
+     * @param pattern
+     */
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }
