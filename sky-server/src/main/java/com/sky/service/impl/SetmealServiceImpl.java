@@ -114,4 +114,17 @@ public class SetmealServiceImpl implements SetmealService {
         return new PageResult(page.getTotal(), voList);
     }
 
+    /**
+     * 启用禁用
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void changeStatus(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder().status(status).id(id).build();
+
+        setmealMapper.update(setmeal);
+    }
+
 }

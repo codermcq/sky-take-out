@@ -44,4 +44,12 @@ public class SetmealController {
         PageResult pageResult = setmealService.page(setmealPageQueryDTO);
         return Result.success(pageResult);
     }
+
+    @ApiOperation("启用禁用套餐")
+    @PutMapping("/status/{status}")
+    public Result changeStatus(@PathVariable Integer status, Long id) {
+        log.info("启用禁用套餐: status={}, id={}", status, id);
+        setmealService.changeStatus(status, id);
+        return Result.success();
+    }
 }

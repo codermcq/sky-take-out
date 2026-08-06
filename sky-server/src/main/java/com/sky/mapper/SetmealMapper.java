@@ -49,4 +49,11 @@ public interface SetmealMapper {
      * @return
      */
     Page<Setmeal> pageQuery(Setmeal setmeal);
+
+    /**
+     * 修改套餐信息
+     * @param setmeal
+     */
+    @AutoFill(OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }
