@@ -33,16 +33,14 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
-    @ApiOperation("微信登录")
     @PostMapping("/login")
-    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
-        log.info("微信用户登录: {}", userLoginDTO.getCode());
-        User user = userService.wxLogin(userLoginDTO);
+    @ApiOperation("微信登录")
+    public Result wxLogin(@RequestBody UserLoginDTO userLoginDTO) {
+        log.info("用户端微信登录: {}", userLoginDTO.getCode());
+        User user = userService.login(userLoginDTO);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
-
-        // 生成jwt令牌
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
 
         UserLoginVO userLoginVO = UserLoginVO.builder().id(user.getId()).openid(user.getOpenid()).token(token).build();

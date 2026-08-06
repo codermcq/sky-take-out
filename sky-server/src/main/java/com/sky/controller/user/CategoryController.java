@@ -22,15 +22,14 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 查询分类
-     * @param type
+     * 根据类型查询分类
      * @return
      */
-    @ApiOperation("查询分类")
+    @ApiOperation("根据类型查询分类")
     @GetMapping("/list")
-    public Result list(Integer type) {
-        List<Category> list = categoryService.categoryList(type);
+    public Result<List<Category>> list(Integer type) {
+        log.info("根据类型查询分类: {}", type);
+        List<Category> list = categoryService.list(type);
         return Result.success(list);
     }
-
 }

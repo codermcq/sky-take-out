@@ -1,10 +1,6 @@
 package com.sky.mapper;
 
-import com.github.pagehelper.Page;
-import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
-import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -34,10 +30,10 @@ public interface DishFlavorMapper {
     void deleteByDishIds(List<Long> ids);
 
     /**
-     * 根据菜品id查询口味
+     * 根据菜品id查询相关口味
      * @param id
      * @return
      */
     @Select("select * from dish_flavor where dish_id = #{id}")
-    List<DishFlavor> getByDishId(@Param("id") Long id);
+    List<DishFlavor> getByDishId(Long id);
 }

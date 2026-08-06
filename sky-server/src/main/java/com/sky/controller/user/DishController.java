@@ -25,18 +25,11 @@ public class DishController {
 
     /**
      * 根据分类id查询菜品
-     * @param categoryId
-     * @return
      */
-    @ApiOperation("根据分类id查询菜品")
     @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
     public Result<List<DishVO>> list(Long categoryId) {
-        Dish dish = new Dish();
-        dish.setCategoryId(categoryId);
-        dish.setStatus(StatusConstant.ENABLE);
-
-        List<DishVO> list = dishService.listWithFlavor(dish);
-
-        return Result.success(list);
+       List<DishVO> dishVOList = dishService.list(categoryId);
+       return Result.success(dishVOList);
     }
 }
