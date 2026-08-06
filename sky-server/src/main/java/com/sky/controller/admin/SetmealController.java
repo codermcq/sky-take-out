@@ -5,6 +5,7 @@ import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,11 +46,38 @@ public class SetmealController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 启用禁用套餐
+     * @param status
+     * @param id
+     * @return
+     */
     @ApiOperation("启用禁用套餐")
     @PutMapping("/status/{status}")
     public Result changeStatus(@PathVariable Integer status, Long id) {
         log.info("启用禁用套餐: status={}, id={}", status, id);
         setmealService.changeStatus(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询套餐")
+    public Result list(@PathVariable Long id) {
+        log.info("根据id查询套餐信息: id: {}", id);
+        SetmealVO setmealVO = setmealService.getBySetmealId(id);
+        return Result.success(setmealVO);
+    }
+
+
+    @PutMapping
+    @ApiOperation("修改套餐信息")
+    public Result updateInfo(@RequestBody SetmealDTO setmealDTO) {
+        setmealService.updateInfo(setmealDTO);
         return Result.success();
     }
 }
