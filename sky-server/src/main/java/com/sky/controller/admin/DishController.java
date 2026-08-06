@@ -57,6 +57,18 @@ public class DishController {
     }
 
     /**
+     * 根据分类id查询菜品列表
+     * @param categoryId
+     * @return
+     */
+    @ApiOperation("根据分类id查询菜品列表")
+    @GetMapping("/list")
+    public Result<List<DishVO>> list(Long categoryId) {
+        List<DishVO> list = dishService.list(categoryId);
+        return Result.success(list);
+    }
+
+    /**
      * 菜品删除（支持单个和批量）
      * @param ids
      * @return
