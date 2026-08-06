@@ -167,4 +167,16 @@ public class SetmealServiceImpl implements SetmealService {
         }
     }
 
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        for (Long id : ids) {
+            setmealMapper.deleteById(id);
+            setmealDishMapper.deleteBySetmealId(id);
+        }
+    }
+
 }
