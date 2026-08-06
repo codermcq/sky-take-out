@@ -75,6 +75,7 @@ public class EmployeeController {
     @ApiOperation("员工退出登录")
     @PostMapping("/logout")
     public Result<String> logout() {
+        log.info("员工退出登录");
         return Result.success();
     }
 
@@ -115,6 +116,7 @@ public class EmployeeController {
     @ApiOperation("启用禁用员工状态")
     @PostMapping("/status/{status}")
     public Result status(@PathVariable Integer status, Long id) {
+        log.info("启用禁用员工状态: status={}, id={}", status, id);
         employeeService.status(id, status);
 
         return Result.success();

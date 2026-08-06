@@ -89,6 +89,7 @@ public class CategoryController {
     @ApiOperation("根据类型查询分类")
     @GetMapping("/list")
     public Result<List<Category>> list(Integer type) {
+        log.info("根据类型查询分类: type={}", type);
         List<Category> list = categoryService.list(type);
         return Result.success(list);
     }

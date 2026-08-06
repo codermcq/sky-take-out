@@ -21,4 +21,19 @@
                     </if>
                 </where>
     </select>
+    <select id="pageQuery" resultType="com.sky.entity.Setmeal">
+        select s.* from setmeal s
+        <where>
+            <if test="name != null">
+                and s.name like concat('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                and s.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and s.status = #{status}
+            </if>
+        </where>
+        order by s.create_time desc
+    </select>
 </mapper>

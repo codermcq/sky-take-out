@@ -35,6 +35,7 @@ public class DishController {
     @ApiOperation("新增菜品")
     @PostMapping
     public Result save(@RequestBody DishDTO dishDTO) {
+        log.info("新增菜品: {}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
 
         // 清除缓存数据
@@ -52,6 +53,7 @@ public class DishController {
     @ApiOperation("菜品分页查询")
     @GetMapping("/page")
     public Result page(DishPageQueryDTO dishPageQueryDTO) {
+        log.info("菜品分页查询: {}", dishPageQueryDTO);
         PageResult pageResult = dishService.page(dishPageQueryDTO);
         return Result.success(pageResult);
     }
@@ -64,6 +66,7 @@ public class DishController {
     @ApiOperation("根据分类id查询菜品列表")
     @GetMapping("/list")
     public Result<List<DishVO>> list(Long categoryId) {
+        log.info("根据分类id查询菜品列表: categoryId={}", categoryId);
         List<DishVO> list = dishService.list(categoryId);
         return Result.success(list);
     }
