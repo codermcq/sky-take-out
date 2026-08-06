@@ -115,6 +115,36 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     /**
+     * 根据分类id查询套餐（含菜品和分类名）
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<SetmealVO> listByCategoryId(Long categoryId) {
+        Setmeal setmeal = Setmeal.builder().categoryId(categoryId).build();
+        List<Setmeal> list = setmealMapper.list(setmeal);
+
+        List<SetmealVO> voList = new ArrayList<>();
+        for (Setmeal s : list) {
+            SetmealVO vo = new SetmealVO();
+            BeanUtils.copyProperties(s, vo);
+
+            if (s.getCategoryId() != null) {
+                Category category = categoryMapper.getById(s.getCategoryId());
+                if (category != null) {
+                    vo.setCategoryName(category.getName());
+                }
+            }
+
+            List<SetmealDish> dishes = setmealDishMapper.getBySetmealId(s.getId());
+            vo.setSetmealDishes(dishes);
+
+            voList.add(vo);
+        }
+        return voList;
+    }
+
+    /**
      * 启用禁用
      *
      * @param status

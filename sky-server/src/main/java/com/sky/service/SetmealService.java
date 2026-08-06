@@ -39,6 +39,13 @@ public interface SetmealService {
     PageResult page(SetmealPageQueryDTO setmealPageQueryDTO);
 
     /**
+     * 根据分类id查询套餐（含菜品）
+     * @param categoryId
+     * @return
+     */
+    List<SetmealVO> listByCategoryId(Long categoryId);
+
+    /**
      * 启用禁用
      *
      * @param status
