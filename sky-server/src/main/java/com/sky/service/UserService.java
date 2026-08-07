@@ -11,4 +11,10 @@ public interface UserService {
      * @return
      */
     User login(UserLoginDTO userLoginDTO);
+
+    /**
+     * 更新用户信息
+     * @param user
+     */
+    void updateProfile(User user);
 }

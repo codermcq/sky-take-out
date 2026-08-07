@@ -6,4 +6,16 @@
         insert into user(openid, name, phone, sex, id_number, avatar, create_time)
         VALUES (#{openid}, #{name}, #{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+
+    <update id="update" parameterType="com.sky.entity.User">
+        update user
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="idNumber != null">id_number = #{idNumber},</if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

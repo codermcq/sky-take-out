@@ -67,7 +67,7 @@ public class AddressBookServiceImpl implements AddressBookService {
 
     /**
      * 修改地址为默认地址
-     * @param id
+     * @param addressBook
      * @return
      */
     @Override

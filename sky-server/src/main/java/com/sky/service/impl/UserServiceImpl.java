@@ -59,4 +59,9 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    @Override
+    public void updateProfile(User user) {
+        userMapper.update(user);
+    }
 }
