@@ -51,6 +51,21 @@ public class OrdersDTO implements Serializable {
     //收货人
     private String consignee;
 
+    //预计送达时间（前端传字符串 yyyy-MM-dd HH:mm，可能为空串）
+    private String estimatedDeliveryTime;
+
+    //配送状态 1立即送出 0选择具体时间
+    private Integer deliveryStatus;
+
+    //餐具数量
+    private Integer tablewareNumber;
+
+    //餐具数量状态 1按餐量提供 0选择具体数量
+    private Integer tablewareStatus;
+
+    //打包费
+    private Integer packAmount;
+
     private List<OrderDetail> orderDetails;
 
 }
