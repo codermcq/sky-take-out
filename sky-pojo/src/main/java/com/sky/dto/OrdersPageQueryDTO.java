@@ -27,4 +27,6 @@ public class OrdersPageQueryDTO implements Serializable {
 
     private Long userId;
 
+    private Integer payStatus;
+
 }
