@@ -141,11 +141,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 支付成功，修改订单状态
+     * 支付成功，修改订单状态并返回订单数据（用于 WebSocket 推送）
      *
      * @param outTradeNo
+     * @return 更新后的完整订单
      */
-    public void paySuccess(String outTradeNo) {
+    @Override
+    public Orders paySuccess(String outTradeNo) {
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
@@ -158,6 +160,12 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // 返回完整订单数据（合并最新字段）
+        ordersDB.setStatus(Orders.TO_BE_CONFIRMED);
+        ordersDB.setPayStatus(Orders.PAID);
+        ordersDB.setCheckoutTime(orders.getCheckoutTime());
+        return ordersDB;
     }
 
     /**

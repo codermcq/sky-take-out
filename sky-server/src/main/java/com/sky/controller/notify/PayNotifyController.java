@@ -3,8 +3,10 @@ package com.sky.controller.notify;
 import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sky.entity.Orders;
 import com.sky.properties.WeChatProperties;
 import com.sky.service.OrderService;
+import com.sky.websocket.WebSocketServer;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 支付回调相关接口
@@ -28,6 +31,8 @@ public class PayNotifyController {
     private OrderService orderService;
     @Autowired
     private WeChatProperties weChatProperties;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 支付成功回调
@@ -52,7 +57,19 @@ public class PayNotifyController {
         log.info("微信支付交易号：{}", transactionId);
 
         //业务处理，修改订单状态、来单提醒
-        orderService.paySuccess(outTradeNo);
+        Orders orders = orderService.paySuccess(outTradeNo);
+
+        // 通过websocket向管理端推送新订单通知
+        Map<String, Object> map = new HashMap();
+        map.put("id", orders.getId());
+        map.put("number", orders.getNumber());
+        map.put("userName", orders.getUserName());
+        map.put("amount", orders.getAmount());
+        map.put("orderTime", orders.getOrderTime().toString());
+
+        String json = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(json);
 
         //给微信响应
         responseToWeixin(response);
