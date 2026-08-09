@@ -61,6 +61,7 @@ public class PayNotifyController {
 
         // 通过websocket向管理端推送新订单通知
         Map<String, Object> map = new HashMap();
+        map.put("type", 1); // 1=来单提醒
         map.put("id", orders.getId());
         map.put("number", orders.getNumber());
         map.put("userName", orders.getUserName());

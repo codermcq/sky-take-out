@@ -20,6 +20,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderMapper orderMapper;
@@ -49,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 订单提交
@@ -326,9 +330,23 @@ public class OrderServiceImpl implements OrderService {
     public void reminder(Long id) {
         // 催单仅记录日志，无实际推送
         Orders orders = orderMapper.getById(id);
+
         if (orders == null) {
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
         }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 2);// 客户催单
+        map.put("id", orders.getId());
+        map.put("number", orders.getNumber());
+        map.put("userName", orders.getUserName());
+        map.put("amount", orders.getAmount());
+        map.put("orderTime", orders.getOrderTime().toString());
+
+        String json = JSON.toJSONString(map);
+        log.info("[催单] WebSocket 推送: {}", json);
+
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
