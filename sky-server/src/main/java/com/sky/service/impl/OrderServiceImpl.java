@@ -186,9 +186,14 @@ public class OrderServiceImpl implements OrderService {
         List<OrderVO> list = new ArrayList<>();
         // 查出订单,封装结果返回
         if (page != null && page.getTotal() > 0) {
-            // 批量查询订单明细,避免 N+1
+            // 批量查询订单明细,避免 N+1（空列表会导致 SQL IN () 语法错误）
             List<Long> orderIds = page.stream().map(Orders::getId).collect(Collectors.toList());
-            List<OrderDetail> allDetails = orderDetailMapper.getByOrderIds(orderIds);
+            List<OrderDetail> allDetails;
+            if (orderIds.isEmpty()) {
+                allDetails = new ArrayList<>();
+            } else {
+                allDetails = orderDetailMapper.getByOrderIds(orderIds);
+            }
             Map<Long, List<OrderDetail>> detailMap = allDetails.stream()
                     .collect(Collectors.groupingBy(OrderDetail::getOrderId));
 

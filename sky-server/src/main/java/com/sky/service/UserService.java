@@ -17,4 +17,10 @@ public interface UserService {
      * @param user
      */
     void updateProfile(User user);
+
+    /**
+     * 查询当前用户信息
+     * @return
+     */
+    User getProfile();
 }

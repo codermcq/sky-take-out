@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +48,13 @@ public class UserController {
         UserLoginVO userLoginVO = UserLoginVO.builder().id(user.getId()).openid(user.getOpenid()).token(token).build();
 
         return Result.success(userLoginVO);
+    }
+
+    @GetMapping("/profile")
+    @ApiOperation("查询用户信息")
+    public Result<User> getProfile() {
+        User user = userService.getProfile();
+        return Result.success(user);
     }
 
     @PutMapping("/profile")

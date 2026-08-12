@@ -5,15 +5,21 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkSpaceService;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,6 +36,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkSpaceService workSpaceService;
 
     /**
      * 统计营业额
@@ -178,4 +186,83 @@ public class ReportServiceImpl implements ReportService {
 
         return dateList;
     }
+
+    /**
+     * 导出运营数据报表
+     * @param response
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) throws IOException {
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+        LocalDateTime beginTime = LocalDateTime.of(dateBegin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(dateEnd, LocalTime.MAX);
+
+        // 查询最近30天的运营数据
+        BusinessDataVO businessDataVO = workSpaceService.buildBusinessData(beginTime, endTime);
+
+        // 通过POI将数据写入Excel文件中
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+
+        // 基于模板文件创建一个新的Excel文件
+        XSSFWorkbook excel = new XSSFWorkbook(is);
+
+        // 填充数据
+        // 时间（Excel 第2行）
+        XSSFSheet sheet = excel.getSheet("statistics");
+
+        sheet.getRow(1).getCell(1).setCellValue("时间" + beginTime + " ~ " + endTime);
+
+        // 概览数据（Excel 第5、6行）
+        XSSFRow row = sheet.getRow(4);
+        row.getCell(2).setCellValue(businessDataVO.getTurnover());
+        row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+        row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+
+        row = sheet.getRow(5);
+        row.getCell(2).setCellValue(businessDataVO.getValidOrderCount());
+        row.getCell(4).setCellValue(businessDataVO.getUnitPrice());
+
+        // 填充明细数据（Excel 第9行起，共30行；模板行数不足时自动补行）
+        for (int i = 0; i < 30; i++) {
+            LocalDate date = dateBegin.plusDays(i);
+            BusinessDataVO businessData = workSpaceService.buildBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+            row = sheet.getRow(8 + i);
+            if (row == null) {
+                row = sheet.createRow(8 + i);
+            }
+            setCellValue(row, 1, date.toString());
+            setCellValue(row, 2, businessData.getTurnover());
+            setCellValue(row, 3, businessData.getValidOrderCount());
+            setCellValue(row, 4, businessData.getOrderCompletionRate());
+            setCellValue(row, 5, businessData.getUnitPrice());
+            setCellValue(row, 6, businessData.getNewUsers());
+        }
+
+        // 通过输出流将Excel文件下载到客户端浏览器
+        ServletOutputStream outputStream = response.getOutputStream();
+        excel.write(outputStream);
+
+        // 关闭资源
+        outputStream.close();
+        excel.close();
+    }
+
+    /**
+     * 设置单元格值（单元格不存在时自动创建）
+     */
+    private static void setCellValue(XSSFRow row, int col, Object value) {
+        XSSFCell cell = row.getCell(col);
+        if (cell == null) {
+            cell = row.createCell(col);
+        }
+        if (value instanceof Number) {
+            cell.setCellValue(((Number) value).doubleValue());
+        } else {
+            cell.setCellValue(String.valueOf(value));
+        }
+    }
+
 }
+

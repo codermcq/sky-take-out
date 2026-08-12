@@ -15,11 +15,17 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderOverViewVO implements Serializable {
+    //待付款数量
+    private Integer pendingPaymentOrders;
+
     //待接单数量
     private Integer waitingOrders;
 
     //待派送数量
     private Integer deliveredOrders;
+
+    //派送中数量
+    private Integer inDeliveryOrders;
 
     //已完成数量
     private Integer completedOrders;

@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sky.constant.MessageConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.exception.LoginFailedException;
@@ -29,7 +30,6 @@ public class UserServiceImpl implements UserService {
     private WeChatProperties weChatProperties;
     @Autowired
     private UserMapper userMapper;
-
 
     @Override
     public User login(UserLoginDTO userLoginDTO) {
@@ -60,8 +60,22 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    /**
+     * 修改用户信息
+     * @param user
+     */
     @Override
     public void updateProfile(User user) {
         userMapper.update(user);
+    }
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    @Override
+    public User getProfile() {
+        Long userId = BaseContext.getCurrentId();
+        return userMapper.getById(userId);
     }
 }
