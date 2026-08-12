@@ -2,7 +2,10 @@ package com.sky.controller.admin;
 
 import com.sky.result.Result;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +32,59 @@ public class ReportController {
 
     @ApiOperation("营业额统计")
     @GetMapping("/turnover/statistics")
-    public Result<TurnoverReportVO> turnoverStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+    public Result<TurnoverReportVO> turnoverStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 
         TurnoverReportVO turnoverReportVO = reportService.getTurnoverStatistics(begin, end);
 
         return Result.success(turnoverReportVO);
     }
 
+    /**
+     * 用户统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @ApiOperation("用户统计")
+    @GetMapping("/user/statistics")
+    public Result<UserReportVO> userStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 
+        UserReportVO userReportVO = reportService.getUserStatistics(begin, end);
+
+        return Result.success(userReportVO);
+    }
+
+    /**
+     * 订单统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @ApiOperation("订单统计")
+    @GetMapping("/orders/statistics")
+    public Result<OrderReportVO> orderStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+
+        OrderReportVO orderReportVO = reportService.getOrderStatistics(begin, end);
+
+        return Result.success(orderReportVO);
+    }
+
+    /**
+     * 销量前10统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @ApiOperation("销量前10统计")
+    @GetMapping("/top10")
+    public Result<SalesTop10ReportVO> salesTop10Statistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getSalesTop10Statistics(begin, end);
+
+        return Result.success(salesTop10ReportVO);
+    }
 }

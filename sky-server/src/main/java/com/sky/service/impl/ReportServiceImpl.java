@@ -1,9 +1,14 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +19,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 统计营业额
@@ -30,13 +39,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
-        ArrayList<LocalDate> dateList  = new ArrayList<>();
-
-        dateList.add(begin);
-        while (!begin.equals(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
+        ArrayList<LocalDate> dateList = getDateList(begin, end);
 
         ArrayList<Double> turnoverList = new ArrayList<>();
         for (LocalDate date : dateList) {
@@ -60,5 +63,119 @@ public class ReportServiceImpl implements ReportService {
                 .dateList( StringUtils.join(dateList, ","))
                 .turnoverList(StringUtils.join(turnoverList, ","))
                 .build();
+    }
+
+    /**
+     * 用户统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
+        ArrayList<LocalDate> dateList = getDateList(begin, end);
+
+        // 新增用户数量
+        ArrayList<Integer> newUserList = new ArrayList<>();
+        // 每天的总的用户数量
+        ArrayList<Integer> totalUserList = new ArrayList<>();
+
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+            Map<String, Object> map = new HashMap();
+            map.put("end", endTime);
+
+            Integer totalUser = userMapper.countByMap(map);
+            totalUserList.add(totalUser);
+
+            map.put("begin", beginTime);
+            Integer newUser = userMapper.countByMap(map);
+            newUserList.add(newUser);
+        }
+
+        return UserReportVO
+                .builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .newUserList(StringUtils.join(newUserList, ","))
+                .totalUserList(StringUtils.join(totalUserList, ","))
+                .build();
+    }
+
+    @Override
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        ArrayList<LocalDate> dateList = getDateList(begin, end);
+
+        ArrayList<Integer> orderCountList = new ArrayList<>();
+        ArrayList<Integer> validOrderCountList = new ArrayList<>();
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("begin", beginTime);
+            map.put("end", endTime);
+
+            Integer order = orderMapper.getOrderCountList(map);
+            orderCountList.add(order);
+
+            map.put("status", Orders.COMPLETED);
+            Integer validOrder = orderMapper.getOrderCountList(map);
+            validOrderCountList.add(validOrder);
+        }
+
+        // 从每日数据汇总得到时间范围内的总订单数和有效订单数
+        int totalOrderCount = orderCountList.stream().mapToInt(Integer::intValue).sum();
+        int validOrderCount = validOrderCountList.stream().mapToInt(Integer::intValue).sum();
+        // 先转 double 避免整数除法截断，返回比率（0~1），前端会 *100 显示百分比
+        Double orderCompletionRate = totalOrderCount > 0
+                ? (double) validOrderCount / totalOrderCount
+                : 0.0;
+
+        return OrderReportVO
+                .builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(orderCompletionRate)
+                .orderCountList(StringUtils.join(orderCountList, ","))
+                .validOrderCountList(StringUtils.join(validOrderCountList,","))
+                .build();
+    }
+
+    @Override
+    public SalesTop10ReportVO getSalesTop10Statistics(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+
+        List<String> nameList = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numberList = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+
+        return SalesTop10ReportVO
+                .builder()
+                .nameList(StringUtils.join(nameList, ","))
+                .numberList(StringUtils.join(numberList, ","))
+                .build();
+    }
+
+    /**
+     * 根据开始和结束返回时间段列表
+     * @param begin
+     * @param end
+     * @return
+     */
+    private ArrayList<LocalDate> getDateList(LocalDate begin, LocalDate end) {
+        ArrayList<LocalDate> dateList = new ArrayList<>();
+
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+
+        return dateList;
     }
 }
