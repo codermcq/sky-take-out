@@ -1,6 +1,6 @@
-# 苍穹外卖后端（sky-take-out）
+# 星厨到家后端（sky-take-out）
 
-苍穹外卖（Sky Take-out）餐饮外卖管理系统的后端服务，基于 Spring Boot 构建，同时为「管理端」（React）和「小程序用户端」（微信小程序）提供 REST API。
+星厨到家（Starchef）餐饮外卖管理系统的后端服务，基于 Spring Boot 构建，同时为「管理端」（React）和「小程序用户端」（微信小程序）提供 REST API。
 
 ## 技术栈
 
@@ -60,12 +60,12 @@
 | 项 | 值 |
 |---|---|
 | 端口 | 8080 |
-| MySQL | `localhost:3306 / sky_take_out / root / root` |
+| MySQL | `localhost:3306 / starchef / root / root` |
 | Redis | `127.0.0.1:6379`（无密码） |
-| 管理端 JWT | header `token`，密钥 `itcast`，有效期 2 小时 |
-| 用户端 JWT | header `authentication`，密钥 `codermcq`，有效期 2 小时 |
+| 管理端 JWT | header `token`，密钥 `starchef-admin`，有效期 2 小时 |
+| 用户端 JWT | header `authentication`，密钥 `starchef-user`，有效期 2 小时 |
 
-> 首次运行前需创建数据库 `sky_take_out` 并导入表结构/数据，同时在 `application-dev.yml` 中填入阿里云 OSS 与微信支付的密钥。
+> 首次运行前需创建数据库 `starchef` 并导入表结构/数据，同时在 `application-dev.yml` 中填入阿里云 OSS 与微信支付的密钥。
 
 ## 运行
 
@@ -78,6 +78,6 @@ mvn clean package -DskipTests
 mvn spring-boot:run -pl sky-server -am
 ```
 
-启动类：`com.sky.SkyApplication`
+启动类：`com.starchef.StarchefApplication`
 
 接口文档：启动后访问 `http://localhost:8080/doc.html`（Knife4j）
