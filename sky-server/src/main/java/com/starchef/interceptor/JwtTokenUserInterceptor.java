@@ -51,7 +51,7 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             // 设置当前用户id
             BaseContext.setCurrentId(userId);
 
-            log.info("当前用户id：", userId);
+            log.info("当前用户id：{}", userId);
             //3、通过，放行
             return true;
         } catch (Exception ex) {
@@ -59,5 +59,13 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             response.setStatus(401);
             return false;
         }
+    }
+
+    /**
+     * 请求完成后清理 ThreadLocal，防止 Tomcat 线程复用导致数据串号
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        BaseContext.removeCurrentId();
     }
 }
